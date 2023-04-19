@@ -12,6 +12,7 @@ void SP0256A::begin() {
   digitalWrite(_resetPin, LOW);
   delay(10);
   digitalWrite(_resetPin, HIGH);
+  delay(10); // Add a debounce delay after pulling RESET HIGH
 }
 
 void SP0256A::speakNumber(int number) {
@@ -26,9 +27,16 @@ void SP0256A::speakNumber(int number) {
   // Get the allophone code for the given number
   byte allophoneCode = allophoneCodes[number];
 
-  // Wait for the LRQ pin to go LOW
-  while (digitalRead(_lrqPin) == HIGH) {
+  // Wait for the LRQ pin to go LOW with a timeout
+  unsigned long timeout = 1000; // 1 second timeout, adjust as needed
+  unsigned long startTime = millis();
+  while (digitalRead(_lrqPin) == HIGH && (millis() - startTime) < timeout) {
     delay(1);
+  }
+
+  // Check if the timeout occurred
+  if (digitalRead(_lrqPin) == HIGH) {
+    return; // Timeout occurred, exit the function
   }
 
   // Send the allophone code to the SP0256A
