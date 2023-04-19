@@ -44,6 +44,21 @@ cpp
 
 SP0256A sp0256a(ALD_PIN, LRQ_PIN, RESET_PIN);
 
+    Connect address lines A0-A7 on the SP0256A chip to 8 GPIO pins on the ESP32, for example, GPIO13-GPIO20. These pins will be used for sending allophone data to the chip.
+
+    Connect the ALD (Address Load) pin on the SP0256A chip to another GPIO pin on the ESP32, for example, GPIO5. This pin will be used to signal the chip when the data is ready to be loaded.
+
+    Connect the LRQ (Load Request) pin on the SP0256A chip to another GPIO pin on the ESP32, for example, GPIO4. This pin will be used to check if the SP0256A chip is ready to receive new data.
+
+    Connect the RESET pin on the SP0256A chip to another GPIO pin on the ESP32, for example, GPIO2. This pin will be used to reset the chip.
+
+    Connect the GND (Ground) pin on the SP0256A chip to a GND pin on the ESP32.
+
+    Connect the VCC (Power) pin on the SP0256A chip to a 5V pin on the ESP32. As mentioned earlier, the SP0256A chip requires a 5V power supply, so you may need to use a level shifter or voltage divider between the ESP32's GPIO pins and the ALD, LRQ, RESET, and address lines on the SP0256A chip.
+
+    Connect an amplifier and speaker to the AUDIO OUT pin of the SP0256A chip to hear the generated speech.
+
+
     In the setup() function, initialize the SP0256A module:
 
 cpp

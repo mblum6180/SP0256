@@ -8,39 +8,38 @@ SP0256A::SP0256A(int aldPin, int lrqPin, int resetPin)
 }
 
 void SP0256A::begin() {
-  // Reset the SP0256A
   digitalWrite(_resetPin, LOW);
   delay(10);
   digitalWrite(_resetPin, HIGH);
-  delay(10); // Add a debounce delay after pulling RESET HIGH
 }
 
 void SP0256A::speakNumber(int number) {
-  // Define a list of allophone codes for numbers from 0 to 9
   byte allophoneCodes[] = {0x35, 0x30, 0x31, 0x37, 0x34, 0x3C, 0x3B, 0x3E, 0x3A, 0x3D};
-
-  // Check if the number is within the range 0-9
+  
   if (number < 0 || number > 9) {
     return;
   }
 
-  // Get the allophone code for the given number
   byte allophoneCode = allophoneCodes[number];
-
-  // Wait for the LRQ pin to go LOW with a timeout
-  unsigned long timeout = 1000; // 1 second timeout, adjust as needed
-  unsigned long startTime = millis();
-  while (digitalRead(_lrqPin) == HIGH && (millis() - startTime) < timeout) {
+  
+  while (digitalRead(_lrqPin) == HIGH) {
     delay(1);
   }
 
-  // Check if the timeout occurred
-  if (digitalRead(_lrqPin) == HIGH) {
-    return; // Timeout occurred, exit the function
+  // Set the address lines to the corresponding allophone code
+  for (int i = 0; i < 8; i++) {
+    pinMode(13 + i, OUTPUT);
+    digitalWrite(13 + i, (allophoneCode & (1 << i)) ? HIGH : LOW);
   }
 
-  // Send the allophone code to the SP0256A
+  // Load the allophone code into the SP0256A
   digitalWrite(_aldPin, LOW);
-  shiftOut(_resetPin, _lrqPin, LSBFIRST, allophoneCode);
+  delay(1);
   digitalWrite(_aldPin, HIGH);
+
+  // Set the address lines back to INPUT mode to avoid interference
+  for (int i = 0; i < 8; i++) {
+    pinMode(13 + i, INPUT);
+  }
 }
+
